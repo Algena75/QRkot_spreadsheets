@@ -69,25 +69,34 @@ async def investment_process(obj_in, session: AsyncSession):
     )
     donation_balance = donation.full_amount - donation.invested_amount
     if project_balance > donation_balance:
-        charity_project.invested_amount += donation_balance
-        donation.invested_amount += donation_balance
-        donation.fully_invested = True
-        donation.close_date = datetime.now()
+        charity_project, donation = objects_update(
+            charity_project, donation, donation_balance
+        )
     elif project_balance < donation_balance:
-        charity_project.invested_amount += project_balance
-        donation.invested_amount += project_balance
-        charity_project.fully_invested = True
-        charity_project.close_date = datetime.now()
+        donation, charity_project = objects_update(
+            donation, charity_project, project_balance
+        )
     else:
-        charity_project.invested_amount = charity_project.full_amount
-        charity_project.fully_invested = True
-        charity_project.close_date = datetime.now()
-        donation.invested_amount = donation.full_amount
-        donation.fully_invested = True
-        donation.close_date = datetime.now()
+        charity_project, donation = objects_update(
+            charity_project, donation, project_balance, equal=True
+        )
     session.add(charity_project)
     session.add(donation)
     await session.commit()
     await session.refresh(charity_project)
     await session.refresh(donation)
     return await investment_process(obj_in, session)
+
+
+def objects_update(obj_1, obj_2, balance, equal=None):
+    if not equal:
+        obj_1.invested_amount += balance
+        obj_2.invested_amount += balance
+        obj_2.fully_invested = True
+        obj_2.close_date = datetime.now()
+    else:
+        obj_1.invested_amount = obj_1.full_amount
+        obj_2.invested_amount = obj_2.full_amount
+        obj_1.fully_invested = obj_2.fully_invested = True
+        obj_1.close_date = obj_2.close_date = datetime.now()
+    return obj_1, obj_2

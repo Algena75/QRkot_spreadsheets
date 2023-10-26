@@ -3,6 +3,16 @@ from aiogoogle.auth.creds import ServiceAccountCreds
 
 from app.core.config import settings
 
+
+class GoogleAPIConstants:
+    FORMAT = "%Y/%m/%d %H:%M:%S"
+    SHEETS_VERSION = 'v4'
+    DRIVE_VERSION = 'v3'
+    ROW_COUNT = 100
+    COLUMN_COUNT = 11
+    RANGE = 'A1:E30'
+
+
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
