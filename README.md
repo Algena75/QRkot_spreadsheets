@@ -5,6 +5,7 @@
 Алексей Наумов ( algena75@yandex.ru )
 ## Используемые технолологии:
 * FastAPI
+* Swagger
 * SQLAlchemy
 * SQLite
 * Alembic
